@@ -1,0 +1,86 @@
+# =============================================================================
+#  Monitor SEIN - configuracion
+#  Edita este archivo con el Bloc de notas. Guardar y volver a abrir la app.
+# =============================================================================
+
+# Desde que dia se arma el historico (AAAA-MM-DD)
+fecha_inicio: "2025-01-01"
+
+# Barras a monitorear: nombre que se muestra -> nombre exacto en el IEOD del COES
+# (hoja Cmg_Barra del archivo CMgCP). Puedes agregar cualquier barra de 220 kV.
+barras:
+  "Chavarría 220": "CHAVARRIA 220"
+  "Arequipa 220 (Socabaya)": "SOCABAYA 220"
+  "Piura Oeste 220": "PIURA OESTE 220"
+  "Zorritos 220": "ZORRITOS 220"
+  "Ica 220": "ICA 220"
+  "Tacna 220 (Los Héroes)": "LOS HEROES 220"
+
+# Barra de referencia del SEIN (para medir desacoples / congestion)
+barra_referencia: "SANTA ROSA 220"
+
+# Que barras guardar en la base:
+#   "220"     -> todas las barras de 220 kV (recomendado: luego puedes elegir otras sin volver a descargar)
+#   "config"  -> solo las de arriba + referencia (base mas liviana)
+#   "todas"   -> todas las barras del IEOD (~235)
+guardar_barras: "220"
+
+# Agrupacion de la hoja TIPO_RECURSO del IEOD en tecnologias.
+# Clave = nombre del COES en mayusculas sin tildes, espacios ni simbolos.
+# Lo que no aparezca aqui se muestra como "Otros".
+tecnologias:
+  HPASADA: "Hidro pasada"
+  HREGULACION: "Hidro regulación"
+  GASDECAMISEA: "Gas natural Camisea"
+  GASDEMALACAS: "Gas natural Norte (Malacas/Aguaytía)"
+  GASDEAGUAYTIA: "Gas natural Norte (Malacas/Aguaytía)"
+  NAFTAFLEXIGASGASREFINERIA: "Otros térmicos (nafta/flexigas/refinería)"
+  RESIDUAL: "Diésel y residual"
+  DIESEL: "Diésel y residual"
+  CARBON: "Carbón"
+  BAGAZO: "Biomasa (bagazo/biogás)"
+  BIOGAS: "Biomasa (bagazo/biogás)"
+  SOLAR: "Solar"
+  EOLICA: "Eólica"
+
+# Tecnologias que cuentan como RER no convencional (indicador del tablero)
+rer_no_convencional: ["Solar", "Eólica", "Biomasa (bagazo/biogás)"]
+
+# Horas punta para los promedios (fin de intervalo, hora Peru). 18:30 a 23:00 = bloque 18:00-23:00
+punta_desde: "18:30"
+punta_hasta: "23:00"
+
+descarga:
+  # Dias recientes que se vuelven a bajar en cada actualizacion (el COES puede corregirlos)
+  dias_provisionales: 3
+  # Descargas en paralelo (no subir de 4 para no saturar al COES)
+  hilos: 3
+  # Pausa minima (s) entre pedidos de cada hilo
+  pausa_segundos: 1.0
+  timeout_segundos: 180
+  reintentos: 3
+  # Guardar los Excel originales del IEOD en data/crudos (ocupa ~1.4 MB por dia)
+  guardar_crudos: false
+  # Completar con el costo marginal y la demanda en TIEMPO REAL (preliminar)
+  # los dias que el IEOD aun no publica (normalmente hoy y ayer)
+  tiempo_real: true
+
+compartir:
+  # Mientras el tablero este abierto, se actualiza solo cada N minutos (0 = desactivado).
+  # En Streamlit Community Cloud es lo que mantiene los datos al dia.
+  auto_actualizar_minutos: 30
+  # El boton "Actualizar datos" siempre aparece en tu propia PC (localhost).
+  # Para quien entra desde otra PC o desde internet, aparece solo si escribe esta clave.
+  # Vacio = los visitantes nunca ven el boton. En la nube, ponla en Settings > Secrets
+  # como:  clave_actualizar = "tu-clave"   (no la escribas aqui si el repositorio es publico)
+  clave_actualizar: ""
+  # Barras que van en la copia publicada (Publicar.bat): "config" (las de arriba, ~4 MB)
+  # o "220" (todas las de 220 kV, 25-50 MB)
+  publicar_barras: "config"
+
+red:
+  # Proxy de la empresa, por ejemplo "http://proxy.pluz.com.pe:8080". Vacio = el de Windows
+  proxy: ""
+  # true = usar los certificados de Windows (necesario si la red inspecciona SSL)
+  certificados_sistema: true
+  user_agent: "MonitorSEIN/1.0 (uso interno; datos publicos COES)"
